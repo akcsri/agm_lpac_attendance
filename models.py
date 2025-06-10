@@ -1,27 +1,31 @@
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin  # ← 追加
 
 db = SQLAlchemy()
 
-
-from flask_login import UserMixin
-
-class User(db.Model, UserMixin):
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200), nullable=False)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(50), nullable=False)
     participants = db.relationship('Participant', backref='user', lazy=True)
 
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
 class Participant(db.Model):
-    email = db.Column(db.String(120))
-    questions = db.Column(db.Text)
     id = db.Column(db.Integer, primary_key=True)
-    position = db.Column(db.String(100))
-    name = db.Column(db.String(100))
-    agm_status = db.Column(db.String(100))  # AGM出欠
-    lpac_status = db.Column(db.String(100))  # LPAC出欠
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # 所有者ユーザー
+    name = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(150), nullable=False)
+    position = db.Column(db.String(150), nullable=False)
+    questions = db.Column(db.Text, nullable=True)
+    agm_status = db.Column(db.String(50), nullable=True)
+    lpac_status = db.Column(db.String(50), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 def get_user_by_username(username):
     return User.query.filter_by(username=username).first()
