@@ -1,19 +1,18 @@
-
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, login_required, current_user
 from models import db, Participant
 
 app = Flask(__name__)
 
-# 🔧 Flaskアプリの設定
+# Flaskアプリの設定
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///your_database.db'  # 必要に応じて変更
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'your_secret_key'  # セッション管理に必要
 
-# 🔗 SQLAlchemyとアプリを接続
+# SQLAlchemyとアプリを接続
 db.init_app(app)
 
-# 🔐 ログインマネージャーの設定
+# ログインマネージャーの設定
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -38,7 +37,7 @@ def user1_dashboard():
 @app.route('/user2_dashboard', methods=['GET', 'POST'])
 @login_required
 def user2_dashboard():
-    if request.method == 'POST']:
+    if request.method == 'POST':
         participant = Participant.query.filter_by(name=request.form.get('name'), user_id=current_user.id).first()
         if not participant:
             participant = Participant(user_id=current_user.id)
