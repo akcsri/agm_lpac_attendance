@@ -30,7 +30,14 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
-            return redirect(url_for('user1_dashboard'))
+            if user.role == 'user1':
+                return redirect(url_for('user1_dashboard'))
+            elif user.role == 'user2':
+                return redirect(url_for('user2_dashboard'))
+            elif user.role == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            else:
+                return "Unknown role", 403
     return render_template('login.html')
 
 @app.route('/logout')
@@ -53,7 +60,14 @@ def user1_dashboard():
         participant.questions = request.form.get('questions')
         participant.agm_status = request.form.get('agm_status')
         db.session.commit()
-        return redirect(url_for('user1_dashboard'))
+            if user.role == 'user1':
+                return redirect(url_for('user1_dashboard'))
+            elif user.role == 'user2':
+                return redirect(url_for('user2_dashboard'))
+            elif user.role == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            else:
+                return "Unknown role", 403
     participants = Participant.query.filter_by(user_id=current_user.id).all()
     return render_template('user1_dashboard.html', username=current_user.username, participants=participants)
 
