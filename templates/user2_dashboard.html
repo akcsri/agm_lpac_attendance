@@ -1,44 +1,41 @@
-<!DOCTYPE html>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>ユーザーダッシュボード</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User2 Dashboard</title>
 </head>
-<body><img alt="Logo" src="{{ url_for('static', filename='logo.png') }}" style="position: absolute; top: 20px; left: 20px;"/>
-<h2 style="margin-top: 100px;">参加者お一人ずつについて下記の事項を入力して追加ボタンをクリックしてください</h2>
-<h2 style="margin-top: 0px;">Please input the following information for each participant individually, then click the "Add" button.</h2>
-<form method="POST">
-<label style="text-align: left; display: block;">役職 (Title): <input name="position" required="" style="margin-left: 240px;" type="text"/></label><br/>
-<label style="text-align: left; display: block;">氏名 (Name): <input name="name" required="" style="margin-left: 230px;" type="text"/></label><br/>
-<label style="text-align: left; display: block;">メールアドレス (Email Address): <input name="email" required="" style="margin-left: 90px;" type="email"/></label><br/>
-<label style="text-align: left; display: block;">ご質問・ご要望など (Questions or Requests): <textarea name="questions" style="margin-left: 0px;"></textarea></label><br/>
-<label style="text-align: left; display: block;">出欠 (Attendance): 
-            <select name="agm_status" style="margin-left: 20px;">
-<option value="出席">出席 (Present)</option>
-<option value="欠席">欠席 (Absent)</option>
-</select><select name="lpac_status" style="margin-left: 20px;"><option %}="" %}selected{%="" endif="" if="" p.status="出席" value="出席" {%="">出席</option><option %}="" %}selected{%="" endif="" if="" p.status="欠席" value="欠席" {%="">欠席</option></select>
-</label><br/>
-<button style="margin-left: 20px;" type="submit">追加 (Add)</button>
-</form>
-<h2>参加者一覧（更新/削除が可能です）</h2>
-<h2>Participant list (Update/Delete available) </h2>
-<ul>
-  {% for p in participants %}
-    <li>
-      {{ p.position }} - {{ p.name }} - {{ p.email }} - {{ p.questions }}
-      <form action="{{ url_for('update_participant', participant_id=p.id) }}" method="POST" style="display:inline;">
-<select name="agm_status" style="margin-left: 20px;">
-<option %}="" %}selected{%="" endif="" if="" p.status="出席" value="出席" {%="">出席</option>
-<option %}="" %}selected{%="" endif="" if="" p.status="欠席" value="欠席" {%="">欠席</option>
-</select><select name="lpac_status" style="margin-left: 20px;"><option %}="" %}selected{%="" endif="" if="" p.status="出席" value="出席" {%="">出席</option><option %}="" %}selected{%="" endif="" if="" p.status="欠席" value="欠席" {%="">欠席</option></select>
-<button style="margin-left: 20px;" type="submit">更新 (Update)</button>
-</form>
-<form action="{{ url_for('delete_participant', participant_id=p.id) }}" method="POST" style="display:inline;">
-<button onclick="return confirm('本当に削除しますか？ Are you sure you want to delete it?');" style="margin-left: 20px;" type="submit">削除 (Delete)</button>
-</form>
-</li>
-  {% endfor %}
-</ul>
-<a href="{{ url_for('logout') }}">ログアウト（Logout）</a>
+<body>
+    <h1>User2 Dashboard</h1>
+    <form method="POST" action="/attendance">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="position">Position:</label>
+        <input type="text" id="position" name="position" required>
+        <label for="questions">Questions:</label>
+        <textarea id="questions" name="questions" required></textarea>
+        <label for="agm_status">AGM出欠 (Attendance):</label>
+        <select id="agm_status" name="agm_status" required>
+            <option value="出席" {% if p.agm_status == '出席' %}selected{% endif %}>出席</option>
+            <option value="欠席" {% if p.agm_status == '欠席' %}selected{% endif %}>欠席</option>
+        </select>
+        <label for="lpac_status">LPAC出欠 (Attendance):</label>
+        <select id="lpac_status" name="lpac_status" required>
+            <option value="出席" {% if p.lpac_status == '出席' %}selected{% endif %}>出席</option>
+            <option value="欠席" {% if p.lpac_status == '欠席' %}selected{% endif %}>欠席</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+    <h2>Participants</h2>
+    <ul>
+        {% for p in participants %}
+        <li>
+            {{ p.user.username }} - {{ p.position }} - {{ p.name }} - AGM: {{ p.agm_status }} / LPAC: {{ p.lpac_status }} - {{ p.email }} - {{ p.questions }}
+        </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
