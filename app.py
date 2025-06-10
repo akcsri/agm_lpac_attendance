@@ -4,6 +4,16 @@ from flask_login import LoginManager, login_required, current_user
 from models import db, Participant
 
 app = Flask(__name__)
+
+# 🔧 Flaskアプリの設定
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///your_database.db'  # 必要に応じて変更
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'your_secret_key'  # セッション管理に必要
+
+# 🔗 SQLAlchemyとアプリを接続
+db.init_app(app)
+
+# 🔐 ログインマネージャーの設定
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -22,14 +32,13 @@ def user1_dashboard():
         participant.agm_status = request.form.get('agm_status')
         db.session.commit()
         return redirect(url_for('user1_dashboard'))
-
     participants = Participant.query.filter_by(user_id=current_user.id).all()
     return render_template('user1_dashboard.html', username=current_user.username, participants=participants)
 
 @app.route('/user2_dashboard', methods=['GET', 'POST'])
 @login_required
 def user2_dashboard():
-    if request.method == 'POST':
+    if request.method == 'POST']:
         participant = Participant.query.filter_by(name=request.form.get('name'), user_id=current_user.id).first()
         if not participant:
             participant = Participant(user_id=current_user.id)
@@ -42,7 +51,6 @@ def user2_dashboard():
         participant.lpac_status = request.form.get('lpac_status')
         db.session.commit()
         return redirect(url_for('user2_dashboard'))
-
     participants = Participant.query.filter_by(user_id=current_user.id).all()
     return render_template('user2_dashboard.html', username=current_user.username, participants=participants)
 
@@ -53,4 +61,6 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', participants=participants)
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # 初回実行時にテーブルを作成
     app.run(debug=True)
