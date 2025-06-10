@@ -111,30 +111,50 @@ def download_csv():
     return Response(output, mimetype='text/csv',
                     headers={"Content-Disposition": "attachment;filename=participants.csv"})
 
-@app.route('/user1_dashboard')
+
+@app.route('/user1_dashboard', methods=['GET', 'POST'])
 @login_required
 def user1_dashboard():
+    if request.method == 'POST':
+        participant = Participant.query.filter_by(name=request.form.get('name'), user_id=current_user.id).first()
+        if not participant:
+            participant = Participant(user_id=current_user.id)
+            db.session.add(participant)
+        participant.name = request.form.get('name')
+        participant.email = request.form.get('email')
+        participant.position = request.form.get('position')
+        participant.questions = request.form.get('questions')
+        participant.status = request.form.get('status')
+        db.session.commit()
+        return redirect(url_for('user1_dashboard'))
+
+    participants = Participant.query.filter_by(user_id=current_user.id).all()
+    return render_template('user1_dashboard.html', username=current_user.username, participants=participants)
+
     return render_template('user1_dashboard.html', username=current_user.username)
+
 
 @app.route('/user2_dashboard', methods=['GET', 'POST'])
 @login_required
 def user2_dashboard():
     if request.method == 'POST':
-        participant = Participant.query.filter_by(name=request.form['name'], user_id=current_user.id).first()
+        participant = Participant.query.filter_by(name=request.form.get('name'), user_id=current_user.id).first()
         if not participant:
             participant = Participant(user_id=current_user.id)
             db.session.add(participant)
-        participant.name = request.form['name']
-        participant.email = request.form['email']
-        participant.position = request.form['position']
-        participant.questions = request.form['questions']
-        participant.agm_status = request.form['agm_status']
-        participant.lpac_status = request.form['lpac_status']
+        participant.name = request.form.get('name')
+        participant.email = request.form.get('email')
+        participant.position = request.form.get('position')
+        participant.questions = request.form.get('questions')
+        participant.agm_status = request.form.get('agm_status')
+        participant.lpac_status = request.form.get('lpac_status')
         db.session.commit()
         return redirect(url_for('user2_dashboard'))
 
     participants = Participant.query.filter_by(user_id=current_user.id).all()
     return render_template('user2_dashboard.html', username=current_user.username, participants=participants)
+
+    return render_template('user2_dashboard.html', username=current_user.username)
 
 if __name__ == '__main__':
     with app.app_context():
