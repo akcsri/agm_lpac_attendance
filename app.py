@@ -29,7 +29,13 @@ def login():
         user = get_user_by_username(username)
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
-            return redirect(url_for('admin_dashboard' if user.role == 'admin' else 'user_dashboard'))
+            if user.role == 'user1':
+                return redirect(url_for('user1_dashboard'))
+            elif user.role == 'user2':
+                return redirect(url_for('user2_dashboard'))
+            elif user.role == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            return redirect(url_for('index'))
         return 'ログイン失敗'
     return render_template('login.html')
 
@@ -104,6 +110,16 @@ def download_csv():
     output.seek(0)
     return Response(output, mimetype='text/csv',
                     headers={"Content-Disposition": "attachment;filename=participants.csv"})
+
+@app.route('/user1_dashboard')
+@login_required
+def user1_dashboard():
+    return render_template('user1_dashboard.html', username=current_user.username)
+
+@app.route('/user2_dashboard')
+@login_required
+def user2_dashboard():
+    return render_template('user2_dashboard.html', username=current_user.username)
 
 if __name__ == '__main__':
     with app.app_context():
