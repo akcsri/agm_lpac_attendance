@@ -1,46 +1,34 @@
+
 from flask import Flask
 from werkzeug.security import generate_password_hash
+import sys
+
 from models import db, User
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db.init_app(app)
 
-def create_user(username, password, role='user'):
+def create_user(username, password, role):
+    if role not in ['user1', 'user2']:
+        print("Error: role must be 'user1' or 'user2'")
+        return
+
     with app.app_context():
-        db.create_all()  # Ensure tables are created
-        password_hash = generate_password_hash(password)
-        new_user = User(username=username, password_hash=password_hash, role=role)
-        db.session.add(new_user)
-        db.session.commit()
-        print(f"User {username} created successfully.")
-
-if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Create a new user.')
-    parser.add_argument('username', type=str, help='The username of the new user.')
-    parser.add_argument('password', type=str, help='The password of the new user.')
-    parser.add_argument('--role', type=str, default='user', help='The role of the new user.')
-
-    args = parser.parse_args()
-
-    create_user(args.username, args.password, args.role)
-
-def create_user(username, password, role='user'):
-    with app.app_context():
-        db.create_all()
-
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
-            print(f"ユーザー '{username}' はすでに存在します。")
+            print(f"Error: User '{username}' already exists.")
             return
 
         password_hash = generate_password_hash(password)
         new_user = User(username=username, password_hash=password_hash, role=role)
         db.session.add(new_user)
         db.session.commit()
-        print(f"ユーザー '{username}' を作成しました。")
+        print(f"User '{username}' with role '{role}' created successfully.")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 4:
+        print("Usage: create_user.py <username> <password> <role>")
+    else:
+        _, username, password, role = sys.argv
+        create_user(username, password, role)

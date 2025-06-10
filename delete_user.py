@@ -5,7 +5,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db.init_app(app)
 
 def delete_user(username):
@@ -20,10 +19,7 @@ def delete_user(username):
 
 if __name__ == '__main__':
     import argparse
-
     parser = argparse.ArgumentParser(description='Delete a user by username.')
     parser.add_argument('username', type=str, help='The username of the user to delete.')
-
     args = parser.parse_args()
-
     delete_user(args.username)
