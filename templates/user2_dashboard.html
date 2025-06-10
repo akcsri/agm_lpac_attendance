@@ -3,11 +3,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User2 Dashboard</title>
 </head>
 <body>
-    <h1>User2 Dashboard</h1>
+    <h1>Welcome, {{ username }}</h1>
     <form method="POST" action="/attendance">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
@@ -16,16 +15,16 @@
         <label for="position">Position:</label>
         <input type="text" id="position" name="position" required>
         <label for="questions">Questions:</label>
-        <textarea id="questions" name="questions" required></textarea>
+        <textarea id="questions" name="questions"></textarea>
         <label for="agm_status">AGM出欠 (Attendance):</label>
-        <select id="agm_status" name="agm_status" required>
-            <option value="出席" {% if p.agm_status == '出席' %}selected{% endif %}>出席</option>
-            <option value="欠席" {% if p.agm_status == '欠席' %}selected{% endif %}>欠席</option>
+        <select id="agm_status" name="agm_status">
+            <option value="出席">出席</option>
+            <option value="欠席">欠席</option>
         </select>
-        <label for="lpac_status">LPAC出欠 (Attendance):</label>
-        <select id="lpac_status" name="lpac_status" required>
-            <option value="出席" {% if p.lpac_status == '出席' %}selected{% endif %}>出席</option>
-            <option value="欠席" {% if p.lpac_status == '欠席' %}selected{% endif %}>欠席</option>
+        <label for="lpac_status" style="margin-left: 20px;">LPAC出欠 (Attendance):</label>
+        <select id="lpac_status" name="lpac_status">
+            <option value="出席">出席</option>
+            <option value="欠席">欠席</option>
         </select>
         <button type="submit">Submit</button>
     </form>
@@ -33,7 +32,16 @@
     <ul>
         {% for p in participants %}
         <li>
-            {{ p.user.username }} - {{ p.position }} - {{ p.name }} - AGM: {{ p.agm_status }} / LPAC: {{ p.lpac_status }} - {{ p.email }} - {{ p.questions }}
+            {{ p.name }} - {{ p.email }} - {{ p.position }} - {{ p.questions }} - AGM: 
+            <select name="agm_status">
+                <option value="出席" {% if p.agm_status == '出席' %}selected{% endif %}>出席</option>
+                <option value="欠席" {% if p.agm_status == '欠席' %}selected{% endif %}>欠席</option>
+            </select>
+            LPAC: 
+            <select name="lpac_status">
+                <option value="出席" {% if p.lpac_status == '出席' %}selected{% endif %}>出席</option>
+                <option value="欠席" {% if p.lpac_status == '欠席' %}selected{% endif %}>欠席</option>
+            </select>
         </li>
         {% endfor %}
     </ul>
