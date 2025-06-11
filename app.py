@@ -21,8 +21,9 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
-       _user(user)
+        User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            login_user(user)
             if user.role == 'user1':
                 return redirect(url_for('user1_dashboard'))
             elif user.role == 'user2':
@@ -35,7 +36,8 @@ def login():
             return 'Invalid credentials', 401
     return render_template('login.html')
 
-@app.route():
+@app.route('/logout')
+def logout():
     logout_user()
     return redirect(url_for('login'))
 
