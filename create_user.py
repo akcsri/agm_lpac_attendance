@@ -1,22 +1,32 @@
-
 import sys
-from models import db, User
-from app import app
-from werkzeug.security import generate_password_hash
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(80), nullable=False)
 
 def create_user(username, password, role):
-    if role not in ['user1', 'user2', 'admin']:
-        print("Error: role must be 'user1', 'user2', or 'admin'")
-        return
+    new_user = User(username=username, password=password, role=role)
+    db.session.add(new_user)
+    db.session.commit()
+    print(f"User '{username}' created successfully.")
+
+if __name__ == '__main__':
+    if len(sys.argv) != 4:
+        print("Usage: python create_user.py <username> <password> <role>")
+        sys.exit(1)
+
+    username = sys.argv[1]
+    password = sys.argv[2]
+    role = sys.argv[3]
 
     with app.app_context():
-        user = User(username=username, password_hash=generate_password_hash(password), role=role)
-        db.session.add(user)
-        db.session.commit()
-        print(f"User {username} with role {role} created successfully.")
-
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: create_user.py <username> <password> <role>")
-    else:
-        create_user(sys.argv[1], sys.argv[2], sys.argv[3])
+        create_user(username, password, role)
