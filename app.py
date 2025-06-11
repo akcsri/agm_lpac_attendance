@@ -107,7 +107,8 @@ def delete_participant(participant_id):
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    return render_template('admin_dashboard.html')
+    participants = Participant.query.all()
+    return render_template('admin_dashboard.html', participants=participants)
 
 @app.route('/download_csv')
 def download_csv():
