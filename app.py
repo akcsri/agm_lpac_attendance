@@ -42,7 +42,8 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/user1_dashboard')
-def_dashboard.html')
+def user1_dashboard():
+    return render_template('user1_dashboard.html')
 
 @app.route('/user2_dashboard')
 def user2_dashboard():
