@@ -11,7 +11,7 @@
 <ul>
     {% for p in participants %}
       <li>
-        {{ p.user.username }} - {{ p.position }} - {{ p.name }}- {{ p.status }} - {{ p.email }} - {{ p.questions }} 
+        {{ p.user.username }} - {{ p.position }} - {{ p.name }} - {{ p.agm_status }} - {{ p.lpac_status }} - {{ p.email }} - {{ p.questions }} 
       </li>
     {% endfor %}
   </ul>
