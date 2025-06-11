@@ -1,3 +1,4 @@
+
 from flask import Flask, request, redirect, url_for, render_template, Response
 from flask_login import LoginManager, login_user, logout_user, current_user
 from models import db, User, Participant
@@ -21,7 +22,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
             if user.role == 'user1':
