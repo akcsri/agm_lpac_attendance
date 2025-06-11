@@ -41,8 +41,7 @@ def login():
     else:
         return 'Unknown role', 403
         login_user(user)
-        if user.role == 'user1':
-        if user.role == 'user1':
+        if user.role == 'user1':    
             return redirect(url_for('user1_dashboard'))
         elif user.role == 'user2':
             return redirect(url_for('user2_dashboard'))
