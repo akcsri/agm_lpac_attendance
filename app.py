@@ -25,7 +25,7 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             if user.role == 'user1':
-               user1_dashboard'))
+                return redirect(url_for('user1_dashboard'))
             elif user.role == 'user2':
                 return redirect(url_for('user2_dashboard'))
             elif user.role == 'admin':
@@ -37,8 +37,7 @@ def login():
     return render_template('login.html')
 
 @app.route('/user1_dashboard')
-def user1_dashboard():
-   _dashboard():
+def user1():
     return "User2 Dashboard"
 
 @app.route('/admin_dashboard')
