@@ -1,5 +1,4 @@
 
-
 from flask import Flask, request, redirect, url_for, render_template, Response
 from flask_login import LoginManager, login_user, logout_user, current_user
 from models import db, User, Participant
@@ -92,6 +91,10 @@ def update_participant(participant_id):
     participant = Participant.query.get_or_404(participant_id)
     if participant.user_id != current_user.id:
         return "Unauthorized", 403
+    participant.name = request.form.get('name')
+    participant.email = request.form.get('email')
+    participant.position = request.form.get('position')
+    participant.questions = request.form.get('questions')
     participant.agm_status = request.form.get('agm_status')
     participant.lpac_status = request.form.get('lpac_status')  # user2 only
     db.session.commit()
@@ -109,16 +112,19 @@ def delete_participant(participant_id):
 @app.route('/admin_dashboard')
 def admin_dashboard():
     participants = Participant.query.all()
-    return render_template('admin_dashboard.html', participants=participants)
+    agm_count = Participant.query.filter_by(agm_status='出席').count()
+    lpac_count = Participant.query.filter_by(lpac_status='出席').count()
+    return render_template('admin_dashboard.html', participants=participants, agm_count=agm_count, lpac_count=lpac_count)
 
 @app.route('/download_csv')
 def download_csv():
     participants = Participant.query.all()
-    csv_data = "name,email,position,questions,agm_status,lpac_status\n"
+    csv_data = "username,position,name,agm_status,lpac_status,email,questions
+"
     for p in participants:
-        csv_data += f"{p.position},{p.name},{p.agm_status},{p.lpac_status},{p.email},{p.questions}\n"
-    # UTF-8 with BOM
-    bom = '\ufeff'
+        csv_data += f"{p.user.username},{p.position},{p.name},{p.agm_status},{p.lpac_status},{p.email},{p.questions}
+"
+    bom = '﻿'
     return Response(
         bom + csv_data,
         mimetype="text/csv",
