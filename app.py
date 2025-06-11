@@ -41,7 +41,7 @@ def login():
     else:
         return 'Unknown role', 403
         login_user(user)
-        if user.role == 'user1':
+        if user.role == 'user1':    
             return redirect(url_for('user1_dashboard'))
         elif user.role == 'user2':
             return redirect(url_for('user2_dashboard'))
@@ -49,12 +49,12 @@ def login():
             return redirect(url_for('admin_dashboard'))
         else:
             return "Unknown role", 403
-            elif user.role == 'user2':
-                return redirect(url_for('user2_dashboard'))
-            elif user.role == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            else:
-                return "Unknown role", 403
+    if user.role == 'user1':
+        # Perform actions for user1
+        pass
+    elif user.role == 'user2':
+        # Perform actions for user2
+        pass
     return render_template('login.html')
 
 
@@ -85,12 +85,12 @@ def user1_dashboard():
             return redirect(url_for('user1_dashboard'))
         elif user.role == 'user2':
             return redirect(url_for('user2_dashboard'))
-        elif user.role == 'admin':
-            return redirect(url_for('admin_dashboard'))
-        else:
-            return "Unknown role", 403
-            elif user.role == 'user2':
-                return redirect(url_for('user2_dashboard'))
+    if user.role == 'user1':
+        # Perform actions for user1
+        pass
+    elif user.role == 'user2':
+        # Perform actions for user2
+        pass
             elif user.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
             else:
