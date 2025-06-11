@@ -37,7 +37,11 @@ def login():
     return render_template('login.html')
 
 @app.route('/user1_dashboard')
-def user1():
+def user1_dashboard():
+    return "User1 Dashboard"
+
+@app.route('/user2_dashboard')
+def user2_dashboard():
     return "User2 Dashboard"
 
 @app.route('/admin_dashboard')
