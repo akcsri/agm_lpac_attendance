@@ -24,20 +24,18 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
-           .role == 'user1':
+            if user.role == 'user1':
                 return redirect(url_for('user1_dashboard'))
             elif user.role == 'user2':
                 return redirect(url_for('user2_dashboard'))
-            elif user.role == 'admin':
-                return redirect(url_for('admin_dashboard'))
             else:
-                return 'Unknown role', 403
-        else:
             return 'Invalid credentials', 401
     return render_template('login.html')
 
 @app.route('/logout')
-def redirect(url_for('login'))
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/user1_dashboard')
 def user1_dashboard():
