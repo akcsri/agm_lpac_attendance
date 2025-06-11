@@ -46,11 +46,11 @@ def logout():
 @app.route('/user1_dashboard', methods=['GET', 'POST'])
 def user1_dashboard():
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
         position = request.form.get('position')
-        questions = request.form.get('questions')
+        name = request.form.get('name')
         agm_status = request.form.get('agm_status')
+        email = request.form.get('email')
+        questions = request.form.get('questions')
         new_participant = Participant(
             name=name,
             email=email,
@@ -67,12 +67,12 @@ def user1_dashboard():
 @app.route('/user2_dashboard', methods=['GET', 'POST'])
 def user2_dashboard():
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
         position = request.form.get('position')
-        questions = request.form.get('questions')
+        name = request.form.get('name')
         agm_status = request.form.get('agm_status')
         lpac_status = request.form.get('lpac_status')
+        email = request.form.get('email')
+        questions = request.form.get('questions')
         new_participant = Participant(
             name=name,
             email=email,
@@ -93,12 +93,12 @@ def update_participant(participant_id):
     if participant.user_id != current_user.id:
         return "Unauthorized", 403
 
-    participant.name = request.form.get('name')
-    participant.email = request.form.get('email')
     participant.position = request.form.get('position')
-    participant.questions = request.form.get('questions')
+    participant.name = request.form.get('name')
     participant.agm_status = request.form.get('agm_status')
     participant.lpac_status = request.form.get('lpac_status')
+    participant.email = request.form.get('email')
+    participant.questions = request.form.get('questions')
 
     db.session.commit()
     return redirect(request.referrer)
