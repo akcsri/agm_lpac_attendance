@@ -31,7 +31,7 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-    login_user(user)
+            login_user(user)
     if user.role == 'user1':
         return redirect(url_for('user1_dashboard'))
     elif user.role == 'user2':
