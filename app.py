@@ -24,7 +24,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
-            elif user.role == 'user2':
+                       elif user.role == 'user2':
                 return redirect(url_for('user2_dashboard'))
             elif user.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
@@ -34,10 +34,7 @@ def login():
             return 'Invalid credentials', 401
     return render_template('login.html')
 
-@app.route('/logout')
-def logout():
-    logout_user()
-    methods=['GET', 'POST'])
+@app=['GET', 'POST'])
 def user1_dashboard():
     if request.method == 'POST':
         name = request.form.get('name')
