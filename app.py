@@ -24,6 +24,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -32,31 +33,17 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
-    if user.role == 'user1':
-        return redirect(url_for('user1_dashboard'))
-    elif user.role == 'user2':
-        return redirect(url_for('user2_dashboard'))
-    elif user.role == 'admin':
-        return redirect(url_for('admin_dashboard'))
-    else:
-        return 'Unknown role', 403
-        login_user(user)
-        if user.role == 'user1':    
-            return redirect(url_for('user1_dashboard'))
-        elif user.role == 'user2':
-            return redirect(url_for('user2_dashboard'))
-        elif user.role == 'admin':
-            return redirect(url_for('admin_dashboard'))
-        else:
-            return "Unknown role", 403
+            if user.role == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            elif user.role == 'user1':
+                return redirect(url_for('user1_dashboard'))
             elif user.role == 'user2':
                 return redirect(url_for('user2_dashboard'))
-            elif user.role == 'admin':
-                return redirect(url_for('admin_dashboard'))
             else:
-                return "Unknown role", 403
+                return redirect(url_for('index'))
+        else:
+            flash('Invalid username or password')
     return render_template('login.html')
-
 
 @app.route('/logout')
 @login_required
