@@ -116,8 +116,10 @@ def download_csv():
     csv_data = "name,email,position,questions,agm_status,lpac_status\n"
     for p in participants:
         csv_data += f"{p.name},{p.email},{p.position},{p.questions},{p.agm_status},{p.lpac_status}\n"
+    # UTF-8 with BOM
+    bom = '\ufeff'
     return Response(
-        csv_data,
+        bom + csv_data,
         mimetype="text/csv",
         headers={"Content-disposition": "attachment; filename=participants.csv"}
     )
