@@ -1,4 +1,5 @@
 
+
 from flask import Flask, request, redirect, url_for, render_template, Response
 from flask_login import LoginManager, login_user, logout_user, current_user
 from models import db, User, Participant
@@ -108,19 +109,16 @@ def delete_participant(participant_id):
 @app.route('/admin_dashboard')
 def admin_dashboard():
     participants = Participant.query.all()
-    agm_count = Participant.query.filter_by(agm_status='出席').count()
-    lpac_count = Participant.query.filter_by(lpac_status='出席').count()
-    return render_template('admin_dashboard.html', participants=participants, agm_count=agm_count, lpac_count=lpac_count)
+    return render_template('admin_dashboard.html', participants=participants)
 
 @app.route('/download_csv')
 def download_csv():
     participants = Participant.query.all()
-    csv_data = "username,position,name,agm_status,lpac_status,email,questions
-"
+    csv_data = "name,email,position,questions,agm_status,lpac_status\n"
     for p in participants:
-        csv_data += f"{p.user.username},{p.position},{p.name},{p.agm_status},{p.lpac_status},{p.email},{p.questions}
-"
-    bom = '﻿'
+        csv_data += f"{p.position},{p.name},{p.agm_status},{p.lpac_status},{p.email},{p.questions}\n"
+    # UTF-8 with BOM
+    bom = '\ufeff'
     return Response(
         bom + csv_data,
         mimetype="text/csv",
