@@ -20,7 +20,11 @@ def load_user(user_id):
 def login():
     if request.method == 'POST':
         username = request.form['username']
-        password = request.form.role == 'user1':
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            login_user(user)
+            if user.role == 'user1':
                 return redirect(url_for('user1_dashboard'))
             elif user.role == 'user2':
                 return redirect(url_for('user2_dashboard'))
@@ -33,6 +37,5 @@ def login():
     return render_template('login.html')
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+    db.create_all()
     app.run(debug=True)
