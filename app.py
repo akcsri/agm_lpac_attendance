@@ -112,11 +112,14 @@ def admin_dashboard():
 
 @app.route('/download_csv')
 def download_csv():
-    csv_data = "name,role\nAlice,user1\nBob,user2"
+    participants = Participant.query.all()
+    csv_data = "name,email,position,questions,agm_status,lpac_status\n"
+    for p in participants:
+        csv_data += f"{p.name},{p.email},{p.position},{p.questions},{p.agm_status},{p.lpac_status}\n"
     return Response(
         csv_data,
         mimetype="text/csv",
-        headers={"Content-disposition": "attachment; filename=users.csv"}
+        headers={"Content-disposition": "attachment; filename=participants.csv"}
     )
 
 if __name__ == '__main__':
