@@ -33,8 +33,7 @@ def login():
         if user and user.check_password(password):
             login_user(user)
     if user.role == 'user1':
-        # Add your logic for user1
-        return
+        return redirect(url_for('user1_dashboard'))
     elif user.role == 'user2':
         return redirect(url_for('user2_dashboard'))
     elif user.role == 'admin':
