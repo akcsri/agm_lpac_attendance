@@ -26,7 +26,21 @@ def login():
             login_user(user)
             if user.role == 'user1':
                 return redirect(url_for('user1_dashboard'))
-           POST'])
+            elif user.role == 'user2':
+                return redirect(url_for('user2_dashboard'))
+            elif user.role == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            else:
+                return 'Unknown role', 403
+        else:
+            return 'Invalid credentials', 401
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    return redirect(url_for('login'))
+
+@app.route('/user1_dashboard', methods=['GET', 'POST'])
 def user1_dashboard():
     if request.method == 'POST':
         # POST処理を書く（例：フォームの内容を処理）
