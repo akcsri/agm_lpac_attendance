@@ -33,9 +33,18 @@ def login():
             else:
                 return 'Unknown role', 403
         else:
-            return 'Invalid credentials', 401
-    return render_template('login.html')
+            return 'Invalid():
+    return "User1 Dashboard"
+
+@app.route('/user2_dashboard')
+def user2_dashboard():
+    return "User2 Dashboard"
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    return "Admin Dashboard"
 
 if __name__ == '__main__':
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
