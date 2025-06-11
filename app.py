@@ -98,11 +98,11 @@ def update_participant(participant_id):
     participant.position = request.form.get('position')
     participant.questions = request.form.get('questions')
     participant.agm_status = request.form.get('agm_status')
-    participant.lpac_status = request.form.get('lpac_status')  # user2 only
+    participant.lpac_status = request.form.get('lpac_status')
 
     db.session.commit()
     return redirect(request.referrer)
-
+    
 @app.route('/delete_participant/<int:participant_id>', methods=['POST'])
 def delete_participant(participant_id):
     participant = Participant.query.get_or_404(participant_id)
