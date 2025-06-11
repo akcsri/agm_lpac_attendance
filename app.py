@@ -38,15 +38,15 @@ def login():
 
 @app.route('/user1_dashboard')
 def user1_dashboard():
-    return "User1 Dashboard"
+    return render_template('user1_dashboard.html')
 
 @app.route('/user2_dashboard')
 def user2_dashboard():
-    return "User2 Dashboard"
+    return render_template('user2_dashboard.html')
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    return "Admin Dashboard"
+    return render_template('admin_dashboard.html')
 
 if __name__ == '__main__':
     with app.app_context():
