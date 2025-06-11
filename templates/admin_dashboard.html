@@ -1,14 +1,24 @@
-<h2>参加者一覧</h2>
-<ul>
-  {% for p in participants %}
-    <li>
-      {{ p.user.username }} - {{ p.position }} - {{ p.name }} - AGM: {{ p.agm_status }} - LPAC: {{ p.lpac_status }} - {{ p.email }} - {{ p.questions }}
-    </li>
-  {% endfor %}
-</ul>
 
-<h3>出席者の合計人数</h3>
-<ul>
-  <li>AGM 出席者数: {{ agm_count }}</li>
-  <li>LPAC 出席者数: {{ lpac_count }}</li>
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h2>参加者一覧</h2>
+    <ul>
+      {% for p in participants %}
+        <li>
+          {{ p.user.username }} - {{ p.position }} - {{ p.name }} - AGM: {{ p.agm_status }} - LPAC: {{ p.lpac_status }} - {{ p.email }} - {{ p.questions }}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <h3>出席者の合計人数</h3>
+    <ul>
+      <li>AGM 出席者数: {{ agm_count }}</li>
+      <li>LPAC 出席者数: {{ lpac_count }}</li>
+    </ul>
+</body>
+</html>
