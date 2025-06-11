@@ -31,7 +31,14 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             if user.role == 'user1':
-                return redirect(url_for('user1_dashboard'))
+        if user.role == 'user1':
+            return redirect(url_for('user1_dashboard'))
+        elif user.role == 'user2':
+            return redirect(url_for('user2_dashboard'))
+        elif user.role == 'admin':
+            return redirect(url_for('admin_dashboard'))
+        else:
+            return "Unknown role", 403
             elif user.role == 'user2':
                 return redirect(url_for('user2_dashboard'))
             elif user.role == 'admin':
@@ -61,7 +68,14 @@ def user1_dashboard():
         participant.agm_status = request.form.get('agm_status')
         db.session.commit()
             if user.role == 'user1':
-                return redirect(url_for('user1_dashboard'))
+        if user.role == 'user1':
+            return redirect(url_for('user1_dashboard'))
+        elif user.role == 'user2':
+            return redirect(url_for('user2_dashboard'))
+        elif user.role == 'admin':
+            return redirect(url_for('admin_dashboard'))
+        else:
+            return "Unknown role", 403
             elif user.role == 'user2':
                 return redirect(url_for('user2_dashboard'))
             elif user.role == 'admin':
