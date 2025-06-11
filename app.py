@@ -61,7 +61,7 @@ def user1_dashboard():
         db.session.commit()
 
     participants = Participant.query.filter_by(user_id=current_user.id).all()
-    return render_template('user1_dashboard 3.html', participants=participants)
+    return render_template('user1_dashboard.html', participants=participants)
 
 @app.route('/user2_dashboard', methods=['GET', 'POST'])
 def user2_dashboard():
@@ -86,7 +86,7 @@ def user2_dashboard():
         db.session.commit()
 
     participants = Participant.query.filter_by(user_id=current_user.id).all()
-    return render_template('user2_dashboard 7.html', participants=participants)
+    return render_template('user2_dashboard.html', participants=participants)
 
 @app.route('/update_participant/<int:participant_id>', methods=['POST'])
 def update_participant(participant_id):
