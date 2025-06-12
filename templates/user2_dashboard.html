@@ -2,11 +2,18 @@
 <html>
 <head>
   <title>ユーザーダッシュボード</title>
-<script>
-function showAlert() {
-    alert('更新しました Updated');
-}
-</script>
+  <script>
+    function showAlert() {
+      alert('更新しました Updated');
+    }
+  </script>
+  <style>
+    .participant-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
   <img alt="Logo" src="{{ url_for('static', filename='logo.png') }}" style="position: absolute; top: 20px; left: 20px;" />
@@ -48,16 +55,17 @@ function showAlert() {
           <option value="出席" {% if p.lpac_status == '出席' %}selected{% endif %}>LPAC出席</option>
           <option value="欠席" {% if p.lpac_status == '欠席' %}selected{% endif %}>LPAC欠席</option>
         </select>
-       <button onclick="showAlert()" type="submit">更新 (Update)</button>
+        <div class="participant-actions">
+          <button onclick="showAlert()" type="submit">更新 (Update)</button>
       </form>
-
       <form action="{{ url_for('delete_participant', participant_id=p.id) }}" method="POST">
-        <button onclick="return confirm('本当に削除しますか？');" type="submit">削除 (Delete)</button>
-      </form>
+          <button onclick="return confirm('本当に削除しますか？');" type="submit">削除 (Delete)</button>
+        </form>
+        </div>
     </li>
     {% endfor %}
   </ul>
 
-  <a href="{{ url_for('logout') }}">ログアウト（Log out）</a>
+  <a href="{{ url_for('logout') }}">ログアウト（Logout）</a>
 </body>
 </html>
