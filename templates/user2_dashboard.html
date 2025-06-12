@@ -8,10 +8,21 @@
     }
   </script>
   <style>
-    .participant-actions {
+    .participant-row {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
-      margin-top: 5px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .participant-row input,
+    .participant-row select,
+    .participant-row textarea,
+    .participant-row button {
+      margin: 2px 0;
+    }
+    .participant-row textarea {
+      vertical-align: middle;
     }
   </style>
 </head>
@@ -42,7 +53,7 @@
   <ul>
     {% for p in participants %}
     <li>
-      <form action="{{ url_for('update_participant', participant_id=p.id) }}" method="POST">
+      <form class="participant-row" action="{{ url_for('update_participant', participant_id=p.id) }}" method="POST">
         <input type="text" name="position" value="{{ p.position }}" placeholder="役職">
         <input type="text" name="name" value="{{ p.name }}" placeholder="氏名">
         <input type="email" name="email" value="{{ p.email }}" placeholder="メールアドレス">
@@ -55,13 +66,9 @@
           <option value="出席" {% if p.lpac_status == '出席' %}selected{% endif %}>LPAC出席</option>
           <option value="欠席" {% if p.lpac_status == '欠席' %}selected{% endif %}>LPAC欠席</option>
         </select>
-        <div class="participant-actions">
-          <button onclick="showAlert()" type="submit">更新 (Update)</button>
+        <button onclick="showAlert()" type="submit">更新 (Update)</button>
+        <button onclick="return confirm('本当に削除しますか？');" type="submit" formaction="{{ url_for('delete_participant', participant_id=p.id) }}">削除 (Delete)</button>
       </form>
-      <form action="{{ url_for('delete_participant', participant_id=p.id) }}" method="POST">
-          <button onclick="return confirm('本当に削除しますか？');" type="submit">削除 (Delete)</button>
-        </form>
-        </div>
     </li>
     {% endfor %}
   </ul>
