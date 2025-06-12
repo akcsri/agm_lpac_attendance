@@ -115,7 +115,16 @@ def delete_participant(participant_id):
 @app.route('/admin_dashboard')
 def admin_dashboard():
     participants = Participant.query.all()
-    return render_template('admin_dashboard.html', participants=participants)
+
+    agm_count = sum(1 for p in participants if p.agm_status == '出席')
+    lpac_count = sum(1 for p in participants if p.lpac_status == '出席')
+
+    return render_template(
+        'admin_dashboard.html',
+        participants=participants,
+        agm_count=agm_count,
+        lpac_count=lpac_count
+    )
 
 @app.route('/download_csv')
 def download_csv():
