@@ -1,4 +1,4 @@
-name
+
 
 from flask import Flask, request, redirect, url_for, render_template, Response
 from flask_login import LoginManager, login_user, logout_user, current_user
