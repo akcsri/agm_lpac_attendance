@@ -2,7 +2,11 @@
 <html>
 <head>
   <title>ユーザーダッシュボード</title>
-</head>
+<script>
+function showAlert() {
+    alert('更新しました Updated');
+}
+</script></head>
 <body>
   <img alt="Logo" src="{{ url_for('static', filename='logo.png') }}" style="position: absolute; top: 20px; left: 20px;" />
   <h2 style="margin-top: 100px;">参加者お一人ずつについて下記の事項を入力して追加ボタンをクリックしてください</h2>
@@ -15,8 +19,8 @@
     <label>ご質問・ご要望など (Questions or Requests): <textarea name="questions"></textarea></label><br/>
     <label>出欠 (Attendance): 
       <select name="agm_status">
-        <option value="出席">出席 (Present)</option>
-        <option value="欠席">欠席 (Absent)</option>
+        <option value="出席">AGM出席 (Present)</option>
+        <option value="欠席">AGM欠席 (Absent)</option>
       </select>
     </label><br/>
     <button type="submit">追加 (Add)</button>
@@ -32,10 +36,10 @@
         <input type="email" name="email" value="{{ p.email }}" placeholder="メールアドレス">
         <textarea name="questions" placeholder="ご質問・ご要望">{{ p.questions }}</textarea>
         <select name="agm_status">
-          <option value="出席" {% if p.agm_status == '出席' %}selected{% endif %}>出席</option>
-          <option value="欠席" {% if p.agm_status == '欠席' %}selected{% endif %}>欠席</option>
+          <option value="出席" {% if p.agm_status == '出席' %}selected{% endif %}>AGM出席</option>
+          <option value="欠席" {% if p.agm_status == '欠席' %}selected{% endif %}>AGM欠席</option>
         </select>
-        <button type="submit">更新 (Update)</button>
+       <button onclick="showAlert()" type="submit">更新 (Update)</button>
       </form>
 
       <form action="{{ url_for('delete_participant', participant_id=p.id) }}" method="POST">
