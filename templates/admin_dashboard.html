@@ -1,26 +1,20 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-  <title>管理者ダッシュボード</title>
+<title>管理者ダッシュボード</title>
 </head>
 <body>
-  <h1>管理者ページ</h1>
-
-  <h2>参加者一覧</h2>
-  <ul>
-    {% for p in participants %}
-    <li>
-      {{ p.user.username }} - {{ p.position }} - {{ p.name }} - {{ p.agm_status }} - {{ p.lpac_status }} - {{ p.email }} - {{ p.questions }} 
-    </li>
-    {% endfor %}
-  </ul>
-
-  <h3>AGM出席者: {{ agm_count }}人</h3>
-  <h3>LPAC出席者: {{ lpac_count }}人</h3>
-
-  <a href="{{ url_for('download_csv') }}">
-    <button type="button">参加者一覧をCSV出力</button>
-  </a>
-  <a href="{{ url_for('logout') }}">ログアウト</a>
+<h1>管理者ページ</h1>
+<h2>参加者一覧</h2>
+<table border="1"><thead><tr><th>Username</th><th>Title</th><th>Name</th><th>AGM Status</th><th>LPAC Status</th><th>Email</th><th>Questions</th></tr></thead><tbody><tr><td>
+      {{ p.user.username }}</td><td>{{ p.position }}</td><td>{{ p.name }}</td><td>{{ p.agm_status }}</td><td>{{ p.lpac_status }}</td><td>{{ p.email }}</td><td>{{ p.questions }} 
+    </td></tr></tbody></table>
+<h3>AGM出席者: {{ agm_count }}人</h3>
+<h3>LPAC出席者: {{ lpac_count }}人</h3>
+<a href="{{ url_for('download_csv') }}">
+<button type="button">参加者一覧をCSV出力</button>
+</a>
+<a href="{{ url_for('logout') }}">ログアウト</a>
 </body>
 </html>
