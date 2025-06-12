@@ -68,7 +68,7 @@
           <option value="欠席" {% if p.lpac_status == '欠席' %}selected{% endif %}>LPAC欠席</option>
         </select>
         <button onclick="showAlert()" type="submit">更新 (Update)</button>
-        <button onclick="return confirm('本当に削除しますか？');" type="submit" formaction="{{ url_for('delete_participant', participant_id=p.id) }}">削除 (Delete)</button>
+        <button onclick="return confirm('本当に削除しますか？ Are you sure you want to delete it?');" type="submit" formaction="{{ url_for('delete_participant', participant_id=p.id) }}">削除 (Delete)</button>
       </form>
     </li>
     {% endfor %}
