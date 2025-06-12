@@ -131,7 +131,7 @@ def download_csv():
     participants = Participant.query.all()
     csv_data = "username,title,name,agm_status,lpac_status,email,questions\n"
     for p in participants:
-        csv_data += f"{p.username},{p.position},{p.name},{p.agm_status},{p.lpac_status},{p.email},{p.questions}\n"
+        csv_data += f"{p.user.username},{p.position},{p.name},{p.agm_status},{p.lpac_status},{p.email},{p.questions}\n"
     # UTF-8 with BOM
     bom = '\ufeff'
     return Response(
