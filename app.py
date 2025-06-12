@@ -129,7 +129,7 @@ def admin_dashboard():
 @app.route('/download_csv')
 def download_csv():
     participants = Participant.query.all()
-    csv_data = "position,name,agm_status,lpac_status,email,questions\n"
+    csv_data = "title,name,agm_status,lpac_status,email,questions\n"
     for p in participants:
         csv_data += f"{p.position},{p.name},{p.agm_status},{p.lpac_status},{p.email},{p.questions}\n"
     # UTF-8 with BOM
