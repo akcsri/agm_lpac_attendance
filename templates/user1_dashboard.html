@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ユーザーダッシュボード</title>
+  <title>User1 ダッシュボード</title>
   <script>
     function showAlert() {
       alert('更新しました Updated');
     }
   </script>
   <style>
+    body {
+      font-family: sans-serif;
+      margin: 2em;
+      background-color: #f9f9f9;
+    }
     .participant-row {
       display: flex;
       flex-wrap: wrap;
@@ -24,10 +29,42 @@
     .participant-row textarea {
       vertical-align: middle;
     }
+    .flash-messages {
+      margin-bottom: 1em;
+    }
+    .flash {
+      padding: 1em;
+      margin-bottom: 1em;
+      border-radius: 4px;
+    }
+    .flash.error {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    .flash.success {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
   </style>
 </head>
 <body>
   <img alt="Logo" src="{{ url_for('static', filename='logo.png') }}" style="position: absolute; top: 20px; left: 20px;" />
+  
+  <!-- Flashメッセージ表示 -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash {{ category if category else 'info' }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  
   <h2 style="margin-top: 100px;">参加者お一人ずつについて下記の事項を入力して追加ボタンをクリックしてください</h2>
   <h2 style="margin-top: 0px;">Please input the following information for each participant individually, then click the "Add" button.</h2>
 
@@ -36,10 +73,11 @@
     <label>氏名 (Name): <input name="name" required style="margin-left: 230px;" type="text" /></label><br/>
     <label>メールアドレス (Email Address): <input name="email" required style="margin-left: 90px;" type="email" /></label><br/>
     <label>ご質問・ご要望など (Questions or Requests): <textarea name="questions"></textarea></label><br/>
-    <label>出欠 (Attendance): 
+    <label>AGM出欠 (AGM Attendance): 
       <select name="agm_status">
-        <option value="出席">AGM出席 (Present)</option>
-        <option value="欠席">AGM欠席 (Absent)</option>
+        <option value="出席（対面）">出席（対面） (Present In-Person)</option>
+        <option value="出席（オンライン）">出席（オンライン） (Present On-Line)</option>
+        <option value="欠席">欠席 (Absent)</option>
       </select>
     </label><br/>
     <button type="submit">追加 (Add)</button>
@@ -56,9 +94,11 @@
         <input type="email" name="email" value="{{ p.email }}" placeholder="メールアドレス">
         <textarea name="questions" placeholder="ご質問・ご要望">{{ p.questions }}</textarea>
         <select name="agm_status">
-          <option value="出席" {% if p.agm_status == '出席' %}selected{% endif %}>AGM出席</option>
-          <option value="欠席" {% if p.agm_status == '欠席' %}selected{% endif %}>AGM欠席</option>
+          <option value="出席（対面）" {% if p.agm_status == '出席（対面）' %}selected{% endif %}>出席（対面） (In-Person)</option>
+          <option value="出席（オンライン）" {% if p.agm_status == '出席（オンライン）' %}selected{% endif %}>出席（オンライン） (On-Line)</option>
+          <option value="欠席" {% if p.agm_status == '欠席' %}selected{% endif %}>欠席 (Absent)</option>
         </select>
+        <input type="hidden" name="lpac_status" value="{{ p.lpac_status }}">
         <button onclick="showAlert()" type="submit">更新 (Update)</button>
         <button onclick="return confirm('本当に削除しますか？ Are you sure you want to delete it?');" type="submit" formaction="{{ url_for('delete_participant', participant_id=p.id) }}">削除 (Delete)</button>
       </form>
@@ -66,6 +106,9 @@
     {% endfor %}
   </ul>
 
-  <a href="{{ url_for('logout') }}">ログアウト（Logout）</a>
+  <div style="margin-top: 2em;">
+    <a href="{{ url_for('index') }}">← ホームに戻る</a> | 
+    <a href="{{ url_for('logout') }}">ログアウト（Logout）</a>
+  </div>
 </body>
 </html>

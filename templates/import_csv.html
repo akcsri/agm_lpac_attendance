@@ -73,15 +73,15 @@
             <h3>📋 CSVフォーマット</h3>
             <p>以下の形式でCSVファイルを作成してください（1行目はヘッダー）：</p>
             <div class="sample-format">ユーザー名,役職,名前,メール,質問,AGMステータス,LPACステータス
-user1,部長,山田太郎,yamada@example.com,特になし,出席,出席
-user2,課長,佐藤花子,sato@example.com,駐車場について,出席,欠席
-user1,係長,鈴木一郎,suzuki@example.com,,欠席,欠席</div>
+user1,部長,山田太郎,yamada@example.com,特になし,出席（対面）,出席（対面）
+user2,課長,佐藤花子,sato@example.com,駐車場について,出席（オンライン）,欠席
+user1,係長,鈴木一郎,suzuki@example.com,,欠席,出席（オンライン）</div>
             
             <h4>📌 注意事項：</h4>
             <ul>
                 <li>ユーザー名、役職、名前、メールは必須項目です</li>
                 <li>ユーザー名は既に登録されているユーザーである必要があります</li>
-                <li>AGMステータスとLPACステータスは「出席」または「欠席」です</li>
+                <li>AGMステータスとLPACステータスは「出席（対面）」「出席（オンライン）」「欠席」のいずれかです</li>
                 <li>同じ名前の参加者が存在する場合は更新されます</li>
                 <li>UTF-8（BOM付き）で保存してください</li>
             </ul>

@@ -111,7 +111,11 @@
     <div class="stats">
       <h3>📈 統計情報</h3>
       <p><strong>AGM出席者: {{ agm_count }}人</strong></p>
+      <p style="margin-left: 2em;">└ 出席（対面）: {{ agm_present_inperson }}人</p>
+      <p style="margin-left: 2em;">└ 出席（オンライン）: {{ agm_present_online }}人</p>
       <p><strong>LPAC出席者: {{ lpac_count }}人</strong></p>
+      <p style="margin-left: 2em;">└ 出席（対面）: {{ lpac_present_inperson }}人</p>
+      <p style="margin-left: 2em;">└ 出席（オンライン）: {{ lpac_present_online }}人</p>
       <p>全参加者数: {{ participants|length }}人</p>
     </div>
 

@@ -1,10 +1,12 @@
 from flask import Flask, request, redirect, url_for, render_template, flash, Response
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_mail import Mail, Message
 from werkzeug.security import check_password_hash
 from models import db, User, get_user_by_username, Participant
 import os
 import csv
 import io
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key')
@@ -28,8 +30,19 @@ else:
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL or 'sqlite:///agm_lpac.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# メール設定
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() == 'true'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', os.environ.get('MAIL_USERNAME'))
+# 通知先メールアドレス（カンマ区切りで複数指定可能）
+app.config['NOTIFICATION_EMAILS'] = os.environ.get('NOTIFICATION_EMAILS', '').split(',') if os.environ.get('NOTIFICATION_EMAILS') else []
+
 # DBとLoginManagerの初期化
 db.init_app(app)
+mail = Mail(app)
 
 # アプリケーション起動時にテーブルを作成（既存のテーブル・データは保持される）
 with app.app_context():
@@ -49,6 +62,35 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# メール通知関数
+def send_notification_email(subject, body):
+    """管理者に通知メールを送信（複数アドレス対応）"""
+    if not app.config['NOTIFICATION_EMAILS'] or not app.config['NOTIFICATION_EMAILS'][0]:
+        print("⚠️ NOTIFICATION_EMAILS not configured. Email not sent.")
+        return
+    
+    if not app.config['MAIL_USERNAME'] or not app.config['MAIL_PASSWORD']:
+        print("⚠️ Mail credentials not configured. Email not sent.")
+        return
+    
+    try:
+        # 空文字列を除外してクリーンアップ
+        recipients = [email.strip() for email in app.config['NOTIFICATION_EMAILS'] if email.strip()]
+        
+        if not recipients:
+            print("⚠️ No valid email addresses configured.")
+            return
+        
+        msg = Message(
+            subject=f"[AGM/LPAC Attendance] {subject}",
+            recipients=recipients,
+            body=body
+        )
+        mail.send(msg)
+        print(f"✅ Email sent to {len(recipients)} recipient(s): {subject}")
+    except Exception as e:
+        print(f"❌ Email sending failed: {e}")
+
 # ユーザー読み込み関数
 @login_manager.user_loader
 def load_user(user_id):
@@ -63,6 +105,12 @@ def login():
         user = get_user_by_username(username)
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
+            
+            # ログイン通知メール
+            send_notification_email(
+                subject="ユーザーログイン",
+                body=f"ユーザー: {username}\n時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\nロール: {user.role}"
+            )
             
             # ロールに応じてリダイレクト
             if user.role == 'admin':
@@ -87,7 +135,15 @@ def index():
 @app.route('/logout')
 @login_required
 def logout():
+    username = current_user.username
     logout_user()
+    
+    # ログアウト通知メール
+    send_notification_email(
+        subject="ユーザーログアウト",
+        body=f"ユーザー: {username}\n時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    )
+    
     flash('ログアウトしました', 'success')
     return redirect(url_for('login'))
 
@@ -107,11 +163,23 @@ def user1_dashboard():
         
         if participant:
             # 更新
+            old_data = f"{participant.position} - {participant.name} - {participant.email} - AGM:{participant.agm_status}"
             participant.position = position
             participant.email = email
             participant.questions = questions
             participant.agm_status = agm_status
-            flash('参加者情報を更新しました', 'success')
+            action = "更新"
+            
+            # 更新通知メール
+            send_notification_email(
+                subject="参加者情報更新",
+                body=f"操作: 参加者情報更新\n"
+                     f"ユーザー: {current_user.username}\n"
+                     f"時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                     f"【変更前】\n{old_data}\n\n"
+                     f"【変更後】\n{position} - {name} - {email} - AGM:{agm_status}\n"
+                     f"質問: {questions or '（なし）'}"
+            )
         else:
             # 新規追加
             participant = Participant(
@@ -123,9 +191,23 @@ def user1_dashboard():
                 user_id=current_user.id
             )
             db.session.add(participant)
-            flash('参加者を追加しました', 'success')
+            action = "追加"
+            
+            # 追加通知メール
+            send_notification_email(
+                subject="参加者追加",
+                body=f"操作: 参加者追加\n"
+                     f"ユーザー: {current_user.username}\n"
+                     f"時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                     f"役職: {position}\n"
+                     f"氏名: {name}\n"
+                     f"メール: {email}\n"
+                     f"AGMステータス: {agm_status}\n"
+                     f"質問: {questions or '（なし）'}"
+            )
         
         db.session.commit()
+        flash(f'参加者を{action}しました', 'success')
         return redirect(url_for('user1_dashboard'))
 
     participants = Participant.query.filter_by(user_id=current_user.id).all()
@@ -148,12 +230,25 @@ def user2_dashboard():
         
         if participant:
             # 更新
+            old_data = f"{participant.position} - {participant.name} - {participant.email} - AGM:{participant.agm_status} LPAC:{participant.lpac_status}"
             participant.position = position
             participant.email = email
             participant.questions = questions
             participant.agm_status = agm_status
             participant.lpac_status = lpac_status
-            flash('参加者情報を更新しました', 'success')
+            action = "更新"
+            
+            # 更新通知メール
+            send_notification_email(
+                subject="参加者情報更新",
+                body=f"操作: 参加者情報更新\n"
+                     f"ユーザー: {current_user.username}\n"
+                     f"時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                     f"【変更前】\n{old_data}\n\n"
+                     f"【変更後】\n{position} - {name} - {email}\n"
+                     f"AGM: {agm_status}, LPAC: {lpac_status}\n"
+                     f"質問: {questions or '（なし）'}"
+            )
         else:
             # 新規追加
             participant = Participant(
@@ -166,9 +261,24 @@ def user2_dashboard():
                 user_id=current_user.id
             )
             db.session.add(participant)
-            flash('参加者を追加しました', 'success')
+            action = "追加"
+            
+            # 追加通知メール
+            send_notification_email(
+                subject="参加者追加",
+                body=f"操作: 参加者追加\n"
+                     f"ユーザー: {current_user.username}\n"
+                     f"時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                     f"役職: {position}\n"
+                     f"氏名: {name}\n"
+                     f"メール: {email}\n"
+                     f"AGMステータス: {agm_status}\n"
+                     f"LPACステータス: {lpac_status}\n"
+                     f"質問: {questions or '（なし）'}"
+            )
         
         db.session.commit()
+        flash(f'参加者を{action}しました', 'success')
         return redirect(url_for('user2_dashboard'))
 
     participants = Participant.query.filter_by(user_id=current_user.id).all()
@@ -184,12 +294,33 @@ def update_participant(participant_id):
         flash('権限がありません', 'error')
         return redirect(url_for('index'))
     
+    # 変更前のデータを保存
+    old_agm = participant.agm_status
+    old_lpac = participant.lpac_status
+    
     participant.position = request.form.get('position')
     participant.name = request.form.get('name')
     participant.email = request.form.get('email')
     participant.questions = request.form.get('questions')
     participant.agm_status = request.form.get('agm_status')
     participant.lpac_status = request.form.get('lpac_status')
+    
+    # ステータス更新通知メール
+    status_change = []
+    if old_agm != participant.agm_status:
+        status_change.append(f"AGM: {old_agm} → {participant.agm_status}")
+    if old_lpac != participant.lpac_status:
+        status_change.append(f"LPAC: {old_lpac} → {participant.lpac_status}")
+    
+    if status_change:
+        send_notification_email(
+            subject="参加者ステータス更新",
+            body=f"操作: ステータス更新\n"
+                 f"ユーザー: {current_user.username}\n"
+                 f"時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                 f"参加者: {participant.position} - {participant.name}\n"
+                 f"変更内容:\n" + "\n".join(status_change)
+        )
     
     db.session.commit()
     flash('参加者情報を更新しました', 'success')
@@ -205,8 +336,20 @@ def delete_participant(participant_id):
         flash('権限がありません', 'error')
         return redirect(url_for('index'))
     
+    participant_info = f"{participant.position} - {participant.name} - {participant.email}"
+    
     db.session.delete(participant)
     db.session.commit()
+    
+    # 削除通知メール
+    send_notification_email(
+        subject="参加者削除",
+        body=f"操作: 参加者削除\n"
+             f"ユーザー: {current_user.username}\n"
+             f"時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+             f"削除された参加者: {participant_info}"
+    )
+    
     flash('参加者を削除しました', 'success')
     return redirect(request.referrer or url_for('index'))
 
@@ -220,14 +363,23 @@ def admin_dashboard():
 
     participants = Participant.query.all()
     
-    # 出席者数をカウント
-    agm_count = sum(1 for p in participants if p.agm_status == '出席')
-    lpac_count = sum(1 for p in participants if p.lpac_status == '出席')
+    # 出席者数をカウント（対面+オンライン）
+    agm_present_inperson = sum(1 for p in participants if p.agm_status == '出席（対面）')
+    agm_present_online = sum(1 for p in participants if p.agm_status == '出席（オンライン）')
+    agm_count = agm_present_inperson + agm_present_online
+    
+    lpac_present_inperson = sum(1 for p in participants if p.lpac_status == '出席（対面）')
+    lpac_present_online = sum(1 for p in participants if p.lpac_status == '出席（オンライン）')
+    lpac_count = lpac_present_inperson + lpac_present_online
     
     return render_template('admin_dashboard.html', 
                           participants=participants, 
                           agm_count=agm_count,
-                          lpac_count=lpac_count)
+                          agm_present_inperson=agm_present_inperson,
+                          agm_present_online=agm_present_online,
+                          lpac_count=lpac_count,
+                          lpac_present_inperson=lpac_present_inperson,
+                          lpac_present_online=lpac_present_online)
 
 # CSVダウンロード
 @app.route('/download_csv')
@@ -342,6 +494,23 @@ def import_csv():
             
             db.session.commit()
             
+            # インポート通知メール
+            error_details = ""
+            if errors:
+                error_details = "\nエラー詳細:\n" + "\n".join(errors)
+            else:
+                error_details = "\n全て正常にインポートされました"
+            
+            send_notification_email(
+                subject="CSVインポート実行",
+                body=f"操作: CSVインポート\n"
+                     f"実行ユーザー: {current_user.username}\n"
+                     f"時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                     f"インポート成功: {imported_count}件\n"
+                     f"エラー: {len(errors)}件"
+                     f"{error_details}"
+            )
+            
             if imported_count > 0:
                 flash(f'{imported_count}件のデータをインポートしました', 'success')
             if errors:
@@ -417,6 +586,16 @@ def import_users():
                     errors.append(f"行{row_num}: {str(e)}")
             
             db.session.commit()
+            
+            # ユーザーインポート通知メール
+            send_notification_email(
+                subject="ユーザーCSVインポート実行",
+                body=f"操作: ユーザーインポート\n"
+                     f"実行ユーザー: {current_user.username}\n"
+                     f"時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                     f"インポート成功: {imported_count}件\n"
+                     f"エラー: {len(errors)}件"
+            )
             
             if imported_count > 0:
                 flash(f'{imported_count}件のユーザーをインポートしました', 'success')
