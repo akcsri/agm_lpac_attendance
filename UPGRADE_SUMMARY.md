@@ -32,6 +32,13 @@ agm_lpac_attendanceをSQLiteからPostgreSQL方式に完全移行しました。
 - ✅ README.md - 包括的な説明
 - ✅ DEPLOYMENT_GUIDE.md - Renderデプロイ手順
 
+#### 5. CSVインポート/エクスポート機能 📥📤
+- ✅ 参加者CSVエクスポート機能
+- ✅ 参加者CSVインポート機能（一括登録/更新）
+- ✅ ユーザーCSVインポート機能（一括ユーザー作成）
+- ✅ テンプレートファイル提供
+- ✅ UTF-8 BOM対応（Excel互換）
+
 ## ファイル一覧
 
 ### コアファイル
@@ -52,11 +59,19 @@ agm_lpac_attendanceをSQLiteからPostgreSQL方式に完全移行しました。
 ### テンプレート
 - `templates/login.html` - ログインページ
 - `templates/index.html` - ホームページ
+- `templates/admin_dashboard.html` - 管理者ダッシュボード（CSVインポートボタン付き）
+- `templates/import_csv.html` - 参加者CSVインポート画面
+- `templates/import_users.html` - ユーザーCSVインポート画面
 - (その他のテンプレートは既存のものを使用)
 
+### CSVテンプレート
+- `users_template.csv` - ユーザーインポート用テンプレート
+- `participants_template.csv` - 参加者インポート用テンプレート
+
 ### ドキュメント
-- `README.md` - システム概要
+- `README.md` - システム概要（CSVインポート機能説明付き）
 - `DEPLOYMENT_GUIDE.md` - デプロイ手順
+- `UPGRADE_SUMMARY.md` - このファイル
 
 ## 次のステップ
 

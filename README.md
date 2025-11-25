@@ -103,6 +103,49 @@ python create_user.py user2 pass456 --role user2
 python list_users.py
 ```
 
+## CSVインポート/エクスポート機能
+
+### 管理者向け機能
+
+管理者ダッシュボードから以下の操作が可能です：
+
+#### 1. 参加者一覧のCSV出力
+- 📥 全参加者の情報をCSVファイルとしてダウンロード
+- ユーザー名、役職、名前、メール、質問、AGM/LPACステータスを含む
+- UTF-8 BOM付きで出力（Excel対応）
+
+#### 2. 参加者CSVインポート
+- 📤 複数の参加者情報を一括登録/更新
+- テンプレート: `participants_template.csv`
+- フォーマット:
+  ```
+  ユーザー名,役職,名前,メール,質問,AGMステータス,LPACステータス
+  user1,部長,山田太郎,yamada@example.com,特になし,出席,出席
+  user2,課長,佐藤花子,sato@example.com,駐車場について,出席,欠席
+  ```
+- 同じ名前の参加者が存在する場合は更新されます
+
+#### 3. ユーザーCSVインポート
+- 👥 複数のユーザーを一括作成
+- テンプレート: `users_template.csv`
+- フォーマット:
+  ```
+  ユーザー名,パスワード,ロール
+  yamada,Password123,user1
+  tanaka,SecurePass456,user2
+  admin2,AdminPass789,admin
+  ```
+- ロール: `admin`, `user1`, `user2`
+- ⚠️ セキュリティ注意: インポート後はファイルを必ず削除してください
+
+### CSVファイルの作成方法
+
+1. Excelまたはテキストエディタで作成
+2. 1行目にヘッダー（項目名）を記載
+3. UTF-8（BOM付き）で保存
+   - Excel: 「CSV UTF-8（コンマ区切り）」形式で保存
+   - テキストエディタ: エンコーディングを「UTF-8 with BOM」に設定
+
 ## 管理スクリプト
 
 ### ユーザー管理

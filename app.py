@@ -260,6 +260,177 @@ def download_csv():
     return Response(output, mimetype='text/csv',
                     headers={"Content-Disposition": "attachment;filename=agm_lpac_participants.csv"})
 
+# CSVインポート機能（管理者のみ）
+@app.route('/import_csv', methods=['GET', 'POST'])
+@login_required
+def import_csv():
+    if current_user.role != 'admin':
+        flash('管理者のみがインポートできます', 'error')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        if 'csv_file' not in request.files:
+            flash('ファイルが選択されていません', 'error')
+            return redirect(url_for('import_csv'))
+        
+        file = request.files['csv_file']
+        
+        if file.filename == '':
+            flash('ファイルが選択されていません', 'error')
+            return redirect(url_for('import_csv'))
+        
+        if not file.filename.endswith('.csv'):
+            flash('CSVファイルを選択してください', 'error')
+            return redirect(url_for('import_csv'))
+        
+        try:
+            # CSVを読み込む
+            stream = io.StringIO(file.stream.read().decode("UTF-8-SIG"), newline=None)
+            csv_reader = csv.DictReader(stream)
+            
+            imported_count = 0
+            errors = []
+            
+            for row_num, row in enumerate(csv_reader, start=2):  # ヘッダーの次から
+                try:
+                    # 必須フィールドのチェック
+                    username = row.get('ユーザー名', '').strip()
+                    position = row.get('役職', '').strip()
+                    name = row.get('名前', '').strip()
+                    email = row.get('メール', '').strip()
+                    agm_status = row.get('AGMステータス', '').strip()
+                    lpac_status = row.get('LPACステータス', '').strip()
+                    questions = row.get('質問', '').strip()
+                    
+                    if not all([username, position, name, email]):
+                        errors.append(f"行{row_num}: 必須項目が不足しています")
+                        continue
+                    
+                    # ユーザーを検索
+                    user = User.query.filter_by(username=username).first()
+                    if not user:
+                        errors.append(f"行{row_num}: ユーザー '{username}' が見つかりません")
+                        continue
+                    
+                    # 既存の参加者をチェック
+                    participant = Participant.query.filter_by(name=name, user_id=user.id).first()
+                    
+                    if participant:
+                        # 更新
+                        participant.position = position
+                        participant.email = email
+                        participant.questions = questions
+                        participant.agm_status = agm_status
+                        participant.lpac_status = lpac_status
+                    else:
+                        # 新規追加
+                        participant = Participant(
+                            position=position,
+                            name=name,
+                            email=email,
+                            questions=questions,
+                            agm_status=agm_status,
+                            lpac_status=lpac_status,
+                            user_id=user.id
+                        )
+                        db.session.add(participant)
+                    
+                    imported_count += 1
+                
+                except Exception as e:
+                    errors.append(f"行{row_num}: {str(e)}")
+            
+            db.session.commit()
+            
+            if imported_count > 0:
+                flash(f'{imported_count}件のデータをインポートしました', 'success')
+            if errors:
+                flash(f'{len(errors)}件のエラーがありました: ' + '; '.join(errors[:5]), 'error')
+            
+            return redirect(url_for('admin_dashboard'))
+        
+        except Exception as e:
+            flash(f'インポートエラー: {str(e)}', 'error')
+            return redirect(url_for('import_csv'))
+    
+    return render_template('import_csv.html')
+
+# ユーザーインポート機能（管理者のみ）
+@app.route('/import_users', methods=['GET', 'POST'])
+@login_required
+def import_users():
+    if current_user.role != 'admin':
+        flash('管理者のみがインポートできます', 'error')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        if 'csv_file' not in request.files:
+            flash('ファイルが選択されていません', 'error')
+            return redirect(url_for('import_users'))
+        
+        file = request.files['csv_file']
+        
+        if file.filename == '' or not file.filename.endswith('.csv'):
+            flash('CSVファイルを選択してください', 'error')
+            return redirect(url_for('import_users'))
+        
+        try:
+            from werkzeug.security import generate_password_hash
+            
+            stream = io.StringIO(file.stream.read().decode("UTF-8-SIG"), newline=None)
+            csv_reader = csv.DictReader(stream)
+            
+            imported_count = 0
+            errors = []
+            
+            for row_num, row in enumerate(csv_reader, start=2):
+                try:
+                    username = row.get('ユーザー名', '').strip()
+                    password = row.get('パスワード', '').strip()
+                    role = row.get('ロール', 'user1').strip()
+                    
+                    if not all([username, password]):
+                        errors.append(f"行{row_num}: ユーザー名とパスワードは必須です")
+                        continue
+                    
+                    # ロールの検証
+                    if role not in ['admin', 'user1', 'user2']:
+                        errors.append(f"行{row_num}: ロールは admin, user1, user2 のいずれかである必要があります")
+                        continue
+                    
+                    # 既存ユーザーチェック
+                    existing_user = User.query.filter_by(username=username).first()
+                    if existing_user:
+                        errors.append(f"行{row_num}: ユーザー '{username}' は既に存在します")
+                        continue
+                    
+                    # 新規ユーザー作成
+                    new_user = User(
+                        username=username,
+                        password_hash=generate_password_hash(password),
+                        role=role
+                    )
+                    db.session.add(new_user)
+                    imported_count += 1
+                
+                except Exception as e:
+                    errors.append(f"行{row_num}: {str(e)}")
+            
+            db.session.commit()
+            
+            if imported_count > 0:
+                flash(f'{imported_count}件のユーザーをインポートしました', 'success')
+            if errors:
+                flash(f'{len(errors)}件のエラー: ' + '; '.join(errors[:5]), 'error')
+            
+            return redirect(url_for('admin_dashboard'))
+        
+        except Exception as e:
+            flash(f'インポートエラー: {str(e)}', 'error')
+            return redirect(url_for('import_users'))
+    
+    return render_template('import_users.html')
+
 # アプリ起動時にDB作成（ローカル開発用）
 if __name__ == '__main__':
     with app.app_context():
