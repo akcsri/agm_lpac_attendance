@@ -1,19 +1,85 @@
 <!DOCTYPE html>
-
 <html>
 <head>
-<title>ホームページ</title>
+    <title>ホームページ</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2em;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 2em;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 0.3em 0.8em;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .role-admin {
+            background-color: #dc3545;
+            color: white;
+        }
+        .role-user1 {
+            background-color: #007bff;
+            color: white;
+        }
+        .role-user2 {
+            background-color: #28a745;
+            color: white;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 1em 0;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .logout-link {
+            margin-top: 2em;
+            padding-top: 2em;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
 </head>
 <body>
-<h1>ようこそ、{{ current_user.username }} さん</h1>
-<p>あなたのロール: {{ current_user.role }}</p>
-<ul>
-        {% if current_user.role == 'admin' %}
-            <li><a href="{{ url_for('admin_dashboard') }}">管理者ダッシュボード</a></li>
-        {% else %}
-            <li><a href="{{ url_for('user_dashboard') }}">ユーザーダッシュボード</a></li>
-        {% endif %}
-    </ul>
-<a href="{{ url_for('logout') }}">ログアウト</a>
-<div id="welcome-message">{% if current_user.role == 'user1' %}User1 ダッシュボード{% elif current_user.role == 'user2' %}User2 ダッシュボード{% elif current_user.role == 'admin' %}管理者ダッシュボード{% endif %}</div></body>
+    <div class="container">
+        <h1>ようこそ、{{ current_user.username }} さん</h1>
+        <p>あなたのロール: 
+            <span class="role-badge role-{{ current_user.role }}">{{ current_user.role }}</span>
+        </p>
+        
+        <ul>
+            {% if current_user.role == 'admin' %}
+                <li><a href="{{ url_for('admin_dashboard') }}">📊 管理者ダッシュボード</a></li>
+            {% elif current_user.role == 'user1' %}
+                <li><a href="{{ url_for('user1_dashboard') }}">📝 User1 ダッシュボード (AGMのみ)</a></li>
+            {% elif current_user.role == 'user2' %}
+                <li><a href="{{ url_for('user2_dashboard') }}">📝 User2 ダッシュボード (AGM + LPAC)</a></li>
+            {% endif %}
+        </ul>
+        
+        <div class="logout-link">
+            <a href="{{ url_for('logout') }}">🚪 ログアウト</a>
+        </div>
+    </div>
+</body>
 </html>
