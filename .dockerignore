@@ -1,0 +1,55 @@
+# VCS / IDE
+.git
+.github
+.gitignore
+.idea
+.vscode
+
+# Python build junk
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+.pytest_cache
+.venv
+venv
+env
+
+# Local env
+.env
+.env.*
+!.env.example
+
+# Logs / OS
+*.log
+.DS_Store
+Thumbs.db
+
+# SQLite ローカル DB（Render では未使用、本番では絶対に持ち込まない）
+*.db
+*.sqlite
+*.sqlite3
+agm_lpac.db
+
+# 管理スクリプト類は本番イメージに不要（必要なら fly ssh console で個別実行）
+debug_login.py
+delete_user.py
+list_users.py
+reset_password.py
+simple_recreate.py
+update_schema.py
+
+# サンプル CSV / バックアップ系
+users_template_*.xlsx
+users_template_*.csv
+
+# Docs（本番イメージには不要。README は残す）
+*.md
+!README.md
+
+# Fly 設定はホストからコピーしたあと git で管理されるのでイメージ内に重ねない
+Dockerfile
+fly.toml
+.dockerignore
