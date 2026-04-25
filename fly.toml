@@ -1,23 +1,26 @@
-﻿# fly.toml -- agm_lpac_attendance
+# fly.toml -- agm_lpac_attendance
 # https://fly.io/docs/reference/configuration/
 #
-# 繧｢繝励Μ蜷阪・ `fly apps create --generate-name --org personal` 縺ｧ謇輔＞蜃ｺ縺輔ｌ縺溷錐蜑阪ｒ
-# 縺薙％縺ｫ雋ｼ繧贋ｻ倥￠縺ｦ縺上□縺輔＞・井ｾ・ app-abc-xyz-1234・峨ょ・蝗槭ョ繝励Ο繧､蜑阪↓蠢・★譖ｸ縺肴鋤縺医ｋ縺薙→縲・
+# アプリ名は `fly apps create --generate-name --org personal` で払い出された名前を
+# ここに貼り付けてください（例: app-abc-xyz-1234）。初回デプロイ前に必ず書き換えること。
+
 app = "little-glade-311"
-primary_region = "nrt"          # Tokyo 繝ｪ繝ｼ繧ｸ繝ｧ繝ｳ
+primary_region = "nrt"          # Tokyo リージョン
 
 [build]
-  # Dockerfile 繧剃ｽｿ逕ｨ・亥酔繝・ぅ繝ｬ繧ｯ繝医Μ縺ｫ縺ゅｋ Dockerfile 縺瑚・蜍慕噪縺ｫ驕ｸ縺ｰ繧後ｋ・・
+  # Dockerfile を使用（同ディレクトリにある Dockerfile が自動的に選ばれる）
+
 [env]
   PORT     = "8080"
   TZ       = "Asia/Tokyo"
-  # Flask 譛ｬ菴薙↓貂｡繧狗腸蠅・､画焚縲４ECRET_KEY / DATABASE_URL / MAIL_* 縺ｯ fly secrets 縺ｫ蜈･繧後ｋ
+  # Flask 本体に渡る環境変数。SECRET_KEY / DATABASE_URL / MAIL_* は fly secrets に入れる
   PYTHONUNBUFFERED = "1"
 
 [http_service]
   internal_port        = 8080
   force_https          = true
-  # ---- 菴ｿ逕ｨ譎ゅ・縺ｿ襍ｷ蜍包ｼ医さ繧ｹ繝域怙蟆丞喧・峨ゅい繧ｯ繧ｻ繧ｹ縺梧擂縺溘ｉ閾ｪ蜍戊ｵｷ蜍輔・  #      辟｡繧｢繧ｯ繧ｻ繧ｹ縺檎ｶ壹＞縺溘ｉ閾ｪ蜍募●豁｢縲ゅさ繝ｼ繝ｫ繝峨せ繧ｿ繝ｼ繝・1縲・ 遘堤ｨ句ｺｦ ----
+  # ---- 使用時のみ起動（コスト最小化）。アクセスが来たら自動起動、
+  #      無アクセスが続いたら自動停止。コールドスタート 1〜3 秒程度 ----
   auto_stop_machines   = "stop"
   auto_start_machines  = true
   min_machines_running = 0
@@ -27,7 +30,8 @@ primary_region = "nrt"          # Tokyo 繝ｪ繝ｼ繧ｸ繝ｧ繝ｳ
     hard_limit = 100
     soft_limit = 80
 
-# 繝倥Ν繧ｹ繝√ぉ繝・け: /login 縺ｯ隱崎ｨｼ荳崎ｦ√〒 200 繧定ｿ斐☆・医Ο繧ｰ繧､繝ｳ繝壹・繧ｸ縺ｮ HTML・・[[http_service.checks]]
+# ヘルスチェック: /login は認証不要で 200 を返す（ログインページの HTML）
+[[http_service.checks]]
   interval     = "30s"
   timeout      = "5s"
   grace_period = "20s"
