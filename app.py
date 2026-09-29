@@ -610,6 +610,31 @@ def import_users():
     
     return render_template('import_users.html')
 
+# アドミ業務ポータル用API（出席者の一覧をJSONで返す）
+# Fly.io の secrets に ATTENDANCE_API_TOKEN を設定し、ポータルの「出欠アプリの設定」に同じトークンを入れる。
+# 未設定のときは常に 401（APIは使えない）。
+@app.route('/api/participants')
+def api_participants():
+    import hmac
+    token = os.environ.get('ATTENDANCE_API_TOKEN', '')
+    given = request.headers.get('X-API-Token', '')
+    if not token or not hmac.compare_digest(token, given):
+        return {'error': 'unauthorized'}, 401
+    rows = []
+    for p in Participant.query.all():
+        rows.append({
+            'username': p.user.username if p.user else '',
+            'company': '',
+            'position': p.position or '',
+            'name': p.name or '',
+            'email': p.email or '',
+            'questions': p.questions or '',
+            'agm_status': p.agm_status or '',
+            'lpac_status': p.lpac_status or '',
+        })
+    return {'participants': rows}
+
+
 # アプリ起動時にDB作成（ローカル開発用）
 if __name__ == '__main__':
     with app.app_context():
